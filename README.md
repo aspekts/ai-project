@@ -218,3 +218,30 @@ project/
 
 ---
 
+Loaded 372426 road nodes and 449457 road edges.
+Loaded 43565 charging stations.
+Loaded 52228 rows of AADF data for London.
+
+### **Methodology**
+
+#### **Search Algorithms**
+- **A* Search**: Optimizes routes based on distance, energy usage, and traffic.
+- **Breadth-First Search (BFS)**: Explores all nodes at the present depth level before moving on to nodes at the next depth level.
+- **Uniform Cost Search (UCS)**: Similar to BFS but considers the cost of the path, expanding the least-cost node first.
+
+### **Results**
+
+#### **Pathfinding Results**
+- **Without Charging Stations**:
+  - Pathfinding was performed using A* search without considering charging stations.
+  - The optimal path and cost were calculated based on distance and traffic conditions.
+- **With Charging Stations**:
+  - Pathfinding was performed using A* search with mandatory stops at charging stations.
+  - The optimal path and cost were calculated considering both distance and charging station availability.
+  - The total distance and time were calculated for the path with charging stations.
+- **BFS Search**:
+  - Pathfinding was performed using BFS.
+  - The path and cost were calculated based on the number of edges traversed.
+- **UCS Search**:
+  - Pathfinding was performed using UCS.
+  - The optimal path and cost were calculated based on the cumulative cost of the path.

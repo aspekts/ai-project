@@ -4,4 +4,3 @@ geopy
 geopandas
 matplotlib
 shapely
-tkinter

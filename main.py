@@ -102,6 +102,72 @@ def a_star_search(graph, start, goal, heuristic, charging_stations, node_mapping
     path.reverse()
     return path, cost_so_far[goal]
 
+# BFS Search Implementation
+def bfs_search(graph, start, goal):
+    """
+    Perform BFS search on the graph.
+    """
+    frontier = [start]
+    came_from = {start: None}
+
+    while frontier:
+        current = frontier.pop(0)
+
+        if current == goal:
+            break
+
+        for neighbor in graph.neighbors(current):
+            if neighbor not in came_from:
+                frontier.append(neighbor)
+                came_from[neighbor] = current
+
+    if goal not in came_from:
+        return [], float('inf')
+
+    current = goal
+    path = []
+    while current != start:
+        path.append(current)
+        current = came_from[current]
+    path.append(start)
+    path.reverse()
+    return path, len(path) - 1
+
+# UCS Search Implementation
+def ucs_search(graph, start, goal):
+    """
+    Perform UCS search on the graph.
+    """
+    frontier = []
+    heappush(frontier, (0, start))
+    came_from = {}
+    cost_so_far = {start: 0}
+
+    while frontier:
+        current_cost, current = heappop(frontier)
+
+        if current == goal:
+            break
+
+        for neighbor in graph.neighbors(current):
+            new_cost = cost_so_far[current] + graph[current][neighbor]['weight']
+            if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
+                cost_so_far[neighbor] = new_cost
+                heappush(frontier, (new_cost, neighbor))
+                came_from[neighbor] = current
+
+    if goal not in came_from:
+        return [], float('inf')
+
+    current = goal
+    path = []
+    while current != start:
+        path.append(current)
+        current = came_from[current]
+    path.append(start)
+    path.reverse()
+    return path, cost_so_far[goal]
+
 # Calculate Total Distance and Time
 def calculate_total_distance_and_time(path, graph, average_speed):
     total_distance = 0
@@ -221,10 +287,30 @@ class PathfindingApp(tk.Tk):
         path_with_charging, cost_with_charging = a_star_search(G, start_node, goal_node, heuristic, charging_stations, node_mapping, must_visit_charging=True)
         distance_with_charging, time_with_charging = calculate_total_distance_and_time(path_with_charging, G, average_speed)
 
-        result += f"Path with charging stations: {path_with_charging}\n"
+        # Perform BFS search
+        path_bfs, cost_bfs = bfs_search(G, start_node, goal_node)
+
+        # Perform UCS search
+        path_ucs, cost_ucs = ucs_search(G, start_node, goal_node)
+        if path_ucs is None:
+            print("No path found with UCS.")
+            path_ucs = "No path found."
+        if path_bfs is None:
+            print("No path found with BFS.")
+            path_bfs = "No path found."
+        if cost_ucs == float('inf'):
+            cost_ucs = "Infinity"
+        if cost_bfs == float('inf'):
+            cost_bfs = "Infinity"
+
+        result = f"Path with charging stations: {path_with_charging}\n"
         result += f"Cost with charging stations: {cost_with_charging}\n"
         result += f"Total distance with charging stations: {distance_with_charging} km\n"
         result += f"Total time with charging stations: {format_time(time_with_charging)}\n"
+        result += f"Path with BFS: {path_bfs}\n"
+        result += f"Cost with BFS: {cost_bfs}\n"
+        result += f"Path with UCS: {path_ucs}\n"
+        result += f"Cost with UCS: {cost_ucs}\n"
 
         # Display the message box and then show the graph
         self.after(0, lambda: messagebox.showinfo("Pathfinding Result", result))
