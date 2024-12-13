@@ -2,6 +2,12 @@
 
 ---
 
+### Important Note
+
+This project uses Git's Large File System to upload and host the dataset information. As such, if you are to test this code, do not download this code directly as you will recieve compressed (and hence corrupted data). Instead, please clone the directory and the datasets will be downloaded to your respective device.
+
+---
+
 #### **Project Overview**
 
 This project aims to optimize pathfinding for autonomous electric vehicles (EVs) in urban environments by constructing a dynamic routing model. The model considers key factors such as traffic conditions, charging station locations, and road network structure to alleviate range anxiety, reduce travel times, and optimize energy usage. By integrating real-world datasets and leveraging search algorithms (e.g., A*), the solution seeks to enhance EV navigation in complex urban settings, supporting the broader adoption of sustainable and autonomous transport systems.
