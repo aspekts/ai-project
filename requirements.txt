@@ -1,5 +1,7 @@
 pandas
 networkx
 geopy
+geopandas
 matplotlib
 shapely
+tkinter

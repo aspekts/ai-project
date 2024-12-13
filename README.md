@@ -25,7 +25,7 @@ This project aims to optimize pathfinding for autonomous electric vehicles (EVs)
 ---
 
 ### **Current Progress**
-As of now, Steps 1 through 4 (data loading, preprocessing, and graph construction) have been completed. The remaining tasks, including heuristic definition, search implementation, and testing, are yet to be finalized.
+All steps, including data loading, preprocessing, graph construction, heuristic definition, search implementation, and testing, have been completed. Additionally, a GUI using Tkinter has been implemented to input data and visualize results.
 
 ---
 
@@ -73,14 +73,14 @@ As of now, Steps 1 through 4 (data loading, preprocessing, and graph constructio
   - `edges`: List of edges with attributes (length, road type).
 
 #### **2. Loading Traffic Data**
-- **Function**: `load_traffic_data(aadf_path)`
+- **Function**: `load_aadf_data(aadf_path)`
 - **Purpose**:
   - Loads and normalizes traffic data to calculate congestion levels.
 - **Output**:
   - `aadf_data`: DataFrame with road type and congestion levels.
 
 #### **3. Loading Charging Station Data**
-- **Function**: `load_charging_station_data(charging_path)`
+- **Function**: `load_charging_data(charging_path, bounding_box)`
 - **Purpose**:
   - Loads and preprocesses charging station data, filtering for the study area.
 - **Output**:
@@ -93,6 +93,47 @@ As of now, Steps 1 through 4 (data loading, preprocessing, and graph constructio
   - Adds attributes such as congestion and charging availability to nodes and edges.
 - **Output**:
   - `G`: NetworkX directed graph representing the road network.
+  - `node_mapping`: Dictionary mapping node identifiers to coordinates.
+
+#### **5. A* Search Implementation**
+- **Function**: `a_star_search(graph, start, goal, heuristic, charging_stations, node_mapping, must_visit_charging=False)`
+- **Purpose**:
+  - Performs A* search on the graph to find the optimal path.
+  - Considers charging stations if `must_visit_charging` is set to `True`.
+- **Output**:
+  - `path`: List of nodes representing the optimal path.
+  - `cost`: Total cost of the path.
+
+#### **6. Calculate Total Distance and Time**
+- **Function**: `calculate_total_distance_and_time(path, graph, average_speed)`
+- **Purpose**:
+  - Calculates the total distance and time for a given path.
+- **Output**:
+  - `total_distance`: Total distance of the path.
+  - `total_time`: Total time to travel the path.
+
+#### **7. Test and Visualize**
+- **Function**: `test_and_visualize(graph, path_with_charging)`
+- **Purpose**:
+  - Visualizes the graph and the path with charging stations.
+- **Output**:
+  - Displays a plot of the graph with the path highlighted.
+
+#### **8. GUI Application**
+- **Class**: `PathfindingApp(tk.Tk)`
+- **Purpose**:
+  - Provides a graphical user interface for inputting start and goal coordinates, battery percentage, and average speed.
+  - Displays the optimal path and visualizes it on the graph.
+- **Output**:
+  - GUI for user interaction and visualization of results.
+
+#### **9. Test Data File**
+- **File**: `test_data.py`
+- **Purpose**:
+  - Contains sample nodes and edges for testing the pathfinding algorithm.
+  - Includes functions for heuristic definition, A* search implementation, distance and time calculation, and visualization.
+- **Output**:
+  - Test results and visualizations for sample scenarios.
 
 ---
 
@@ -120,6 +161,7 @@ project/
 │   ├── data_processing.py   # Includes functions for loading and preprocessing data
 │   ├── graph.py             # Includes graph construction logic
 │   ├── main.py              # Main script to execute the workflow
+│   ├── test_data.py         # Test data file for presentation purposes
 │
 ├── results/
 │   ├── visualizations/      # Stores graph visualizations
@@ -152,9 +194,8 @@ project/
 2. Set the file paths in `main.py`.
 3. Run `main.py`:
    ```bash
-   python src/main.py
+   python main.py
    ```
-4. View outputs in the `results/` directory.
 
 ---
 
@@ -167,6 +208,7 @@ project/
   - `matplotlib`
   - `shapely`
   - `geopy`
+  - `tkinter`
 
 ---
 

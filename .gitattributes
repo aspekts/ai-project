@@ -3,3 +3,17 @@
 *.prj filter=lfs diff=lfs merge=lfs -text
 *.csv filter=lfs diff=lfs merge=lfs -text
 *.shp filter=lfs diff=lfs merge=lfs -text
+data/national-charge-point-registry.csv filter=lfs diff=lfs merge=lfs -text
+data/TQ_MotorwayJunction.shx filter=lfs diff=lfs merge=lfs -text
+data/TQ_RoadNode.prj filter=lfs diff=lfs merge=lfs -text
+data/TQ_RoadLink.dbf filter=lfs diff=lfs merge=lfs -text
+data/TQ_RoadLink.shp filter=lfs diff=lfs merge=lfs -text
+data/TQ_RoadLink.shx filter=lfs diff=lfs merge=lfs -text
+data/TQ_RoadNode.dbf filter=lfs diff=lfs merge=lfs -text
+data/dft_traffic_counts_aadf.csv filter=lfs diff=lfs merge=lfs -text
+data/TQ_MotorwayJunction.dbf filter=lfs diff=lfs merge=lfs -text
+data/TQ_MotorwayJunction.shp filter=lfs diff=lfs merge=lfs -text
+data/TQ_RoadNode.shp filter=lfs diff=lfs merge=lfs -text
+data/TQ_RoadNode.shx filter=lfs diff=lfs merge=lfs -text
+data/TQ_MotorwayJunction.prj filter=lfs diff=lfs merge=lfs -text
+data/TQ_RoadLink.prj filter=lfs diff=lfs merge=lfs -text

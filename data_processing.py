@@ -12,35 +12,50 @@ def load_road_network_data(road_node_path, road_link_path, motorway_junction_pat
     """
     # Load RoadNode data
     road_nodes = gpd.read_file(road_node_path)
-    road_nodes = road_nodes[['NODE_ID', 'geometry']]
     road_nodes['coordinates'] = road_nodes['geometry'].apply(lambda x: (x.x, x.y))
+    # Create a dictionary for fast lookups
+    node_lookup = road_nodes.set_index('identifier')['coordinates'].to_dict()
 
     # Load RoadLink data
     road_links = gpd.read_file(road_link_path)
-    road_links = road_links[['LINK_ID', 'START_NODE', 'END_NODE', 'length', 'road_type', 'geometry']]
+    road_links = road_links[['identifier', 'startNode', 'endNode', 'length', 'formOfWay', 'geometry']]
+
+    # Ensure consistent types
+    road_links['startNode'] = road_links['startNode'].astype(str).str.strip()
+    road_links['endNode'] = road_links['endNode'].astype(str).str.strip()
+    road_nodes['identifier'] = road_nodes['identifier'].astype(str).str.strip()
+
+    # Debugging: Print the first few rows of road_links
+    print("Road Links:")
+    print(road_links.head())
 
     # Load MotorwayJunction data
     motorway_junctions = gpd.read_file(motorway_junction_path)
-    motorway_junctions = motorway_junctions[['JUNCTION_ID', 'NODE_ID', 'geometry']]
+    motorway_junctions = motorway_junctions[['number', 'identifier', 'geometry']]
     motorway_junctions['coordinates'] = motorway_junctions['geometry'].apply(lambda x: (x.x, x.y))
-
-    # Merge motorway junctions into road nodes
-    road_nodes = road_nodes.merge(
-        motorway_junctions[['NODE_ID', 'JUNCTION_ID']],
-        on='NODE_ID',
-        how='left'
-    )
 
     # Create edges from RoadLink data
     edges = []
     for _, row in road_links.iterrows():
-        start = road_nodes.loc[road_nodes['NODE_ID'] == row['START_NODE'], 'coordinates'].values[0]
-        end = road_nodes.loc[road_nodes['NODE_ID'] == row['END_NODE'], 'coordinates'].values[0]
-        edges.append((start, end, row['length'], row['road_type']))
+        start = node_lookup.get(row['startNode'])
+        end = node_lookup.get(row['endNode'])
 
+        # Debugging: Print start and end nodes
+        if start is None:
+            print(f"Start node {row['startNode']} not found in node_lookup.")
+        if end is None:
+            print(f"End node {row['endNode']} not found in node_lookup.")
+
+        if start and end:
+            edges.append((start, end, row['length'], row['formOfWay']))
+            print(f"Added edge: {start} -> {end}")
+        else:
+            print(f"[PREPROCESSING]: Skipping edge: startNode={row['startNode']} or endNode={row['endNode']} not found in road_nodes.")
+
+    # Check if the road network data is loaded correctly
+    print(f"Loaded {len(road_nodes)} road nodes and {len(edges)} road edges.")
     return road_nodes, edges
-# Load AADF traffic data
-# This data provides average annual daily flow for major and minor roads
+
 def load_aadf_data(csv_path, region_filter='London'):
     """
     Load AADF traffic data and filter for the specified region.
@@ -50,11 +65,13 @@ def load_aadf_data(csv_path, region_filter='London'):
     """
     aadf_data = pd.read_csv(csv_path)
     filtered_data = aadf_data[aadf_data['region_name'] == region_filter]
-    filtered_data['congestion_level'] = filtered_data['AADF'] / filtered_data['AADF'].max()
+    print(f"Loaded {len(filtered_data)} rows of AADF data for {region_filter}.")
+
+    # Calculate congestion level as the sum of all motor vehicles
+    filtered_data['congestion_level'] = filtered_data['all_motor_vehicles'] / filtered_data['all_motor_vehicles'].max()
+
     return filtered_data[['road_name', 'congestion_level']]
 
-# Load charging station data
-# This data includes charging station locations, types, and availability
 def load_charging_data(csv_path, bounding_box):
     """
     Load and filter charging station data within the specified bounding box.
@@ -64,8 +81,9 @@ def load_charging_data(csv_path, bounding_box):
     """
     charging_stations = pd.read_csv(csv_path)
     charging_stations['geometry'] = charging_stations.apply(
-        lambda row: Point(row['Longitude'], row['Latitude']),
+        lambda row: Point(row['longitude'], row['latitude']),
         axis=1
     )
     charging_stations_gdf = gpd.GeoDataFrame(charging_stations, geometry='geometry')
+    print(f"Loaded {len(charging_stations_gdf)} charging stations.")
     return charging_stations_gdf.cx[bounding_box[0]:bounding_box[2], bounding_box[1]:bounding_box[3]]
